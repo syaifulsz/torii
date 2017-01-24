@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>TORII.DEMO</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    </head>
+    <body>
+
+        <div class="container">
+            <div class="page-header">
+                <h1>TORII.DEMO <small>Form to e-mail made simple.</small></h1>
+            </div>
+
+            <form action="/" method="post" class="js-form">
+                <div class="alert alert-success alert-dismissible js-form__alert hide" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <div class="js-form__alert__body"></div>
+                </div>
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <input name="subject" type="text" class="form-control input-lg" id="subject" placeholder="Mail subject">
+                </div>
+                <div class="form-group">
+                    <label for="body">Body</label>
+                    <textarea id="body" class="form-control input-lg" name="body" rows="8" cols="80" placeholder="Mail body"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">Send</button>
+            </form>
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+        <script type="text/javascript">
+
+        $('.js-form').on('submit', function(e) {
+            e.preventDefault();
+            var $form = $(this);
+
+            function alertPopup($state, $class, $body, $form) {
+
+                var $alert = $('.js-form__alert', $form);
+                var $alertBody = $('.js-form__alert__body', $form);
+
+                $alert
+                    .removeClass('alert-success alert-danger alert-warning')
+                    .addClass('hide');
+                $alertBody.html('');
+
+                if ($state == 'show') {
+                    $alert
+                        .addClass($class)
+                        .removeClass('hide');
+                    $alertBody.html($body);
+                }
+            }
+
+            function enableForm($form) {
+                $('.form-control', $form).removeAttr('disabled');
+                $('[type="submit"]', $form).removeAttr('disabled');
+            }
+
+            function disableForm($form) {
+                $('.form-control', $form).attr('disabled', 'disabled');
+                $('[type="submit"]', $form).attr('disabled', 'disabled');
+            }
+
+            alertPopup('hide', '', '', $form);
+            alertPopup('show', 'alert-warning', 'Sending mail...', $form);
+            disableForm($form);
+
+            if (!$('[name="subject"]', $form).val() || !$('[name="body"]', $form).val()) {
+                alertPopup('show', 'alert-danger', 'Subject or Body is empty!', $form);
+                enableForm($form);
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: window.location.origin + window.location.pathname.replace('demo.html', ''),
+                data: {
+                    subject: $('[name="subject"]', $form).val(),
+                    body: $('[name="body"]', $form).val()
+                },
+                success: function(data) {
+                    console.log('success', data);
+                    alertPopup('show', 'alert-success', 'Mail is successfully send!', $form);
+                },
+                error: function(jqXHR, textStatus) {
+                    alertPopup('show', 'alert-danger', 'Oops! Something went wrong, please check your console log.', $form);
+                    console.log('fail_jqXHR', jqXHR);
+                    console.log('fail_textStatus', textStatus);
+                },
+                complete: function() {
+                    enableForm($form);
+                },
+            });
+        });
+
+        </script>
+    </body>
+</html>
