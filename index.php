@@ -41,6 +41,7 @@ if (!isset($config['password']) || !$config['password']) throw new Error('Missin
 
 $mail->Username = $config['email'];
 $mail->Password = $config['password'];
+$mail->setFrom($config['email'], $config['name']);
 $mail->addAddress($config['email'], $config['name']);
 
 $subject = null;
